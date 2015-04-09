@@ -1,0 +1,86 @@
+<!doctype html>
+<html ng-app="myApp">
+    <head>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular.min.js"></script>
+        <style type="text/css">
+		.study-finished-true{
+			text-decoration: line-through;
+			color:gray;
+		}
+        </style>
+    </head>
+    <body>
+        Your name: <input type="text" ng-model="yourname" placeholder="World">
+        <br>
+        Hello {{yourname || 'World'}}!
+		<hr>
+
+        <div ng-controller="TextController">
+        	<ul>
+        		<li ng-repeat="item in study">
+        			index:<span>{{$index}}</span>
+        			id:<span>{{item.index}}</span>
+        			name:<span class="study-finished-{{item.finsh}}" ng-bind="item.name"></span>
+        		</li>	
+        	</ul>
+        	<form ng-submit="addStudy()">
+				add study:<input type="text" ng-model="newstudy">
+				<input type="submit" value="add">
+			</form>
+        	<hr>
+
+			count:<input type="text" ng-model="goods.count">
+			total:<label>{{goods.tatalMoney}}</label>
+			<button ng-click="reset()">Reset count</button>
+
+			<hr>
+			date:<span ng-bind="date| date:'yyyy-MM-dd HH:mm:ss'"></span><br>
+			text:<span ng-bind="'self define filter'| SDStringFilter"></span>
+        </div>
+    </body>
+    <script type="text/javascript">
+	var myModule = angular.module('myApp', []);
+	// 定义服务，provider,factory,service区别
+	myModule.factory("StudyItems",function(){
+		var obj ={};
+		obj.query = function(){
+			return [{index:1,name:"scala",finish:false},{index:2,name:"angularjs",finsh:true}];
+		};
+		return obj;
+	});
+
+	// 自定义filter
+	myModule.filter("SDStringFilter",function() {
+		// 参数名必须为input
+		var rdFilter = function(input){
+			return input+" signed by libailuguo";
+		};
+		return rdFilter;
+	});
+	// 
+	myModule.controller("TextController",function($scope,StudyItems){
+		$scope.study = StudyItems.query();
+		$scope.date = new Date();
+		$scope.addStudy = function(){
+			$scope.study.push({index:$scope.study.length+1,name:$scope.newstudy,finsh:false});
+			$scope.newstudy='';
+		};
+
+
+		$scope.goods = { count:0};
+
+		computeMoney = function(){
+			$scope.goods.tatalMoney = $scope.goods.count * 10;
+		};
+
+		// computeMoney为$scope.computeMoney时,此处也必须为$scope.computeMoney
+		$scope.$watch('goods.count',computeMoney);
+
+		$scope.reset = function(){
+			$scope.goods.count = 0;
+		};
+	});
+	
+
+    </script>
+</html>
